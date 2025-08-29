@@ -1,0 +1,17 @@
+# Core ML Dependencies
+torch>=2.8.0,<3.0.0
+transformers>=4.56.0,<5.0.0
+
+# Web Framework Dependencies
+streamlit>=1.49.1,<2.0.0
+fastapi>=0.116.1,<0.117.0
+uvicorn[standard]>=0.32.0,<0.33.0
+
+# Data Processing & Validation
+pydantic>=2.11.0,<3.0.0
+python-multipart>=0.0.9,<0.1.0
+
+# Logging & Monitoring
+structlog>=25.4.0,<26.0.0
+
+# Development Dependencies (install with: pip install -r requirements.txt -r requirements-dev.txt)
