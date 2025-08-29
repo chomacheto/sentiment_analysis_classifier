@@ -123,3 +123,36 @@ install-dev-pip: install-pip
 	@echo "Installing development dependencies with pip..."
 	.\venv\Scripts\Activate.ps1 && pip install -r requirements-dev.txt
 	@echo "Development dependencies installed with pip"
+
+# Docker targets
+docker-build:
+	@echo "🐳 Building Docker image..."
+	@./scripts/docker/build.sh
+
+docker-run:
+	@echo "🚀 Running Docker container tests..."
+	@./scripts/docker/run.sh
+
+docker-compose-up:
+	@echo "📦 Starting Docker Compose services..."
+	@docker-compose up -d
+
+docker-compose-down:
+	@echo "🛑 Stopping Docker Compose services..."
+	@docker-compose down
+
+docker-compose-dev:
+	@echo "🔧 Starting development environment with hot-reload..."
+	@docker-compose --profile dev up -d
+
+docker-test:
+	@echo "🧪 Running Docker tests..."
+	@python -m pytest tests/test_docker.py -v
+
+docker-clean:
+	@echo "🧹 Cleaning up Docker resources..."
+	@docker system prune -f
+	@docker volume prune -f
+
+# Combined Docker operations
+docker-all: docker-build docker-run docker-test

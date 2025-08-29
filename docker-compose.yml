@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  sentiment-classifier:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: sentiment-classifier-dev
+    volumes:
+      # Mount source code for hot-reload development
+      - ./packages:/app/packages
+      - ./apps:/app/apps
+      - ./setup.py:/app/setup.py
+      # Mount model cache for persistence across container restarts
+      - model-cache:/app/.cache/huggingface
+      # Mount data directory for input/output files
+      - ./data:/app/data
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+      - MODEL_CACHE_DIR=/app/.cache/huggingface
+    ports:
+      - "8000:8000"  # For future web interface
+    working_dir: /app
+    command: ["--help"]  # Default command, can be overridden
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-m", "apps.ml_pipeline.cli", "info"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development service with hot-reload
+  sentiment-classifier-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: sentiment-classifier-hot-reload
+    volumes:
+      # Mount source code for hot-reload
+      - ./packages:/app/packages
+      - ./apps:/app/apps
+      - ./setup.py:/app/setup.py
+      # Mount model cache
+      - model-cache:/app/.cache/huggingface
+      # Mount data directory
+      - ./data:/app/data
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=DEBUG
+      - MODEL_CACHE_DIR=/app/.cache/huggingface
+      - DEVELOPMENT_MODE=true
+    ports:
+      - "8001:8000"
+    working_dir: /app
+    command: ["--help"]
+    restart: unless-stopped
+    profiles:
+      - dev
+
+volumes:
+  model-cache:
+    driver: local
