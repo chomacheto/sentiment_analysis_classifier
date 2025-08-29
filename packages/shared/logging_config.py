@@ -36,6 +36,10 @@ def configure_logging(
         level=getattr(logging, log_level.upper()),
     )
     
+    # Set root logger level explicitly
+    root_logger = logging.getLogger()
+    root_logger.setLevel(getattr(logging, log_level.upper()))
+    
     # Configure structlog processors
     processors: list[Processor] = [
         structlog.stdlib.filter_by_level,
@@ -101,7 +105,13 @@ def _add_file_handler(log_file: Path, log_level: str, environment: str) -> None:
     file_handler.setFormatter(formatter)
     
     # Add handler to root logger
-    logging.getLogger().addHandler(file_handler)
+    root_logger = logging.getLogger()
+    root_logger.addHandler(file_handler)
+    
+    # Store reference for cleanup
+    if not hasattr(root_logger, '_file_handlers'):
+        root_logger._file_handlers = []
+    root_logger._file_handlers.append(file_handler)
 
 
 def get_logger(name: str) -> structlog.BoundLogger:
@@ -114,7 +124,11 @@ def get_logger(name: str) -> structlog.BoundLogger:
     Returns:
         Configured structlog logger
     """
-    return structlog.get_logger(name)
+    logger = structlog.get_logger(name)
+    # Ensure the logger is properly bound
+    if not structlog.is_configured():
+        configure_logging()
+    return logger
 
 
 def log_function_call(func_name: str, **kwargs: Any) -> None:
@@ -195,6 +209,19 @@ def log_ml_operation(
         output_shape=output_shape,
         **kwargs,
     )
+
+
+def cleanup_file_handlers() -> None:
+    """Clean up file handlers to prevent file access issues."""
+    root_logger = logging.getLogger()
+    if hasattr(root_logger, '_file_handlers'):
+        for handler in root_logger._file_handlers:
+            try:
+                handler.close()
+                root_logger.removeHandler(handler)
+            except Exception:
+                pass
+        root_logger._file_handlers.clear()
 
 
 # Default configuration for quick setup
