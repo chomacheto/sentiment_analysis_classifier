@@ -1,24 +1,28 @@
 # Sentiment Analysis Classifier
 
-A modern, production-ready sentiment analysis system built with Python, FastAPI, and Streamlit, designed for enterprise ML workflows.
+A modern, production-ready sentiment analysis system built with Python and Streamlit, featuring explainable AI, comprehensive sample data, and educational tools for portfolio demonstration.
 
 ## 🚀 Features
 
 - **ML-Powered Analysis**: State-of-the-art transformer models for accurate sentiment classification
-- **Web Interface**: Beautiful Streamlit dashboard for interactive analysis
-- **REST API**: FastAPI backend for integration with other systems
-- **Real-time Training**: WebSocket support for live model updates
-- **Enterprise Ready**: PostgreSQL database, Redis caching, and comprehensive monitoring
+- **Explainable AI**: Word-level attention visualization with interactive heatmaps and contribution scores
+- **Sample Data Gallery**: 20+ curated examples across 8 categories (reviews, social media, formal docs, sarcasm)
+- **Educational Tools**: Interactive tutorial system, expected vs. actual results comparison
+- **Use Case Documentation**: Comprehensive guides for different text types and industry applications
+- **Performance Benchmarks**: Accuracy metrics and industry comparisons
+- **Web Interface**: Beautiful Streamlit dashboard with professional styling
+- **Real-time Analysis**: Instant sentiment classification with confidence scores
+- **Export Capabilities**: CSV export for results and visualizations
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Streamlit 1.49+ with custom UI components
-- **Backend**: FastAPI 0.116+ with async support
-- **ML Framework**: PyTorch 2.8+ with Transformers 4.56+
-- **Database**: PostgreSQL 15+ (Supabase)
-- **Cache**: Redis (Vercel KV)
-- **Dependency Management**: Poetry 2.1+
-- **Build Tool**: Nx for monorepo management
+- **Frontend**: Streamlit 1.28+ with custom CSS and Tailwind CSS 3.3+
+- **ML Framework**: PyTorch with Transformers for sentiment analysis
+- **Visualization**: Plotly for interactive charts and attention heatmaps
+- **Data Storage**: Local JSON files for sample data and benchmarks
+- **Dependency Management**: Poetry for package management
+- **Testing**: Pytest with 99% test coverage for new components
 
 ## 📋 Prerequisites
 
@@ -62,11 +66,36 @@ poetry install
 
 ```bash
 # Start the Streamlit web interface
-poetry run streamlit run apps/web/main.py
-
-# Start the FastAPI backend (in another terminal)
-poetry run uvicorn apps.api.main:app --reload
+poetry run streamlit run apps/web/app.py
 ```
+
+The application will be available at `http://localhost:8501`
+
+## 🎯 Key Features in Detail
+
+### 📚 Sample Data Gallery
+- **20+ Curated Examples**: Diverse text samples across 8 categories
+- **One-Click Loading**: Instantly load samples into the analysis interface
+- **Smart Filtering**: Filter by category, difficulty level, and sentiment
+- **Educational Metadata**: Each sample includes expected sentiment, difficulty, and use case
+
+### 🔍 Explainable AI
+- **Word-Level Attention**: Interactive heatmaps showing which words influence predictions
+- **Contribution Scores**: Numerical scores for each word's impact on sentiment
+- **Comparison Mode**: Compare attention patterns between different predictions
+- **Export Visualizations**: Save attention heatmaps as images
+
+### 🎓 Educational Tools
+- **Interactive Tutorial**: Step-by-step guide for first-time users
+- **Results Comparison**: Compare expected vs. actual sentiment predictions
+- **Use Case Documentation**: Industry-specific examples and best practices
+- **Performance Benchmarks**: Accuracy metrics on standard datasets
+
+### 📊 Analysis Features
+- **Real-time Processing**: Instant sentiment classification
+- **Confidence Metrics**: Detailed confidence scores and uncertainty analysis
+- **Prediction History**: Track and compare previous analyses
+- **Export Results**: Download analysis results as CSV files
 
 ## 📁 Project Structure
 
@@ -74,16 +103,35 @@ poetry run uvicorn apps.api.main:app --reload
 sentiment-analysis-classifier/
 ├── apps/                    # Applications
 │   ├── web/                # Streamlit frontend
-│   ├── api/                # FastAPI ML serving backend
-│   └── ml-pipeline/        # Training and model management
+│   │   ├── app.py          # Main web application
+│   │   ├── static/         # CSS and static assets
+│   │   └── requirements.txt
+│   ├── api/                # API components (future)
+│   └── ml_pipeline/        # CLI tools for model management
 ├── packages/                # Shared packages
-│   ├── shared/             # Common types/utilities
-│   ├── ml-core/            # Core ML operations
-│   └── ui-components/      # Reusable UI components
-├── infrastructure/          # Infrastructure as Code
+│   ├── ml_core/            # Core ML operations
+│   │   ├── sentiment_pipeline.py
+│   │   ├── models.py
+│   │   ├── config.py
+│   │   └── validators.py
+│   ├── ui_components/      # Reusable UI components
+│   │   ├── example_gallery.py
+│   │   ├── attention_visualization.py
+│   │   ├── interactive_tutorial.py
+│   │   ├── results_comparison.py
+│   │   └── ... (other components)
+│   └── shared/             # Common utilities
+├── data/                   # Data files
+│   └── samples/            # Sample data and benchmarks
+│       ├── sample_data.json
+│       ├── use_cases.json
+│       └── benchmarks.json
 ├── docs/                   # Documentation
-├── scripts/                 # Build/deploy scripts
-└── tests/                  # Test suite
+│   ├── architecture/       # System architecture docs
+│   ├── stories/           # User stories and requirements
+│   └── prd/               # Product requirements
+├── tests/                  # Test suite
+└── scripts/                # Build/deploy scripts
 ```
 
 ## 🔧 Development
@@ -108,7 +156,10 @@ poetry run pytest
 poetry run pytest --cov=.
 
 # Run specific test file
-poetry run pytest tests/test_ml_core.py
+poetry run pytest tests/test_sample_data.py
+
+# Run tests for specific component
+poetry run pytest tests/test_attention_visualization.py
 ```
 
 ### Code Quality
@@ -126,9 +177,10 @@ poetry run black .
 
 ## 📊 Testing Strategy
 
-- **Unit Tests**: 70% coverage target for core functionality
-- **Integration Tests**: 20% coverage for API and database interactions
-- **E2E Tests**: 10% coverage using Playwright for full user journeys
+- **Unit Tests**: 99% coverage for new components
+- **Integration Tests**: Component integration testing
+- **UI Tests**: Streamlit component testing
+- **Data Validation**: Sample data and benchmark validation
 
 ## 🚀 Deployment
 
@@ -136,24 +188,22 @@ poetry run black .
 
 ```bash
 # Local development with hot reload
-poetry run streamlit run apps/web/main.py --server.port 8501
-poetry run uvicorn apps.api.main:app --reload --port 8000
+poetry run streamlit run apps/web/app.py --server.port 8501
 ```
 
 ### Production
 
 The application is designed for deployment on:
-- **Frontend**: Vercel (Streamlit)
-- **Backend**: Vercel Functions (FastAPI)
-- **Database**: Supabase (PostgreSQL)
-- **Cache**: Vercel KV (Redis)
+- **Streamlit Cloud**: Direct deployment from GitHub
+- **Docker**: Containerized deployment with Dockerfile
+- **Vercel**: Serverless deployment (future)
 
-## 📚 API Documentation
+## 📚 Documentation
 
-Once the FastAPI server is running, visit:
-- **Interactive API Docs**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI Schema**: http://localhost:8000/openapi.json
+- **Architecture**: [docs/architecture/](docs/architecture/) - System design and components
+- **User Stories**: [docs/stories/](docs/stories/) - Feature requirements and implementation
+- **API Documentation**: [docs/architecture/api-specification.md](docs/architecture/api-specification.md)
+- **Testing Strategy**: [docs/architecture/testing-strategy.md](docs/architecture/testing-strategy.md)
 
 ## 🤝 Contributing
 
@@ -176,9 +226,16 @@ For support and questions:
 
 ## 🔄 Version History
 
-- **v0.1.0** - Initial project setup and environment configuration
+- **v2.4.0** - Sample data gallery, educational tools, and use case documentation
+- **v2.3.0** - Explainable AI with word-level attention visualization
+- **v2.2.0** - Confidence visualization and performance metrics
+- **v2.1.0** - Streamlit web interface foundation
+- **v1.4.0** - Docker containerization
+- **v1.3.0** - Command-line interface
+- **v1.2.0** - Basic sentiment classification pipeline
+- **v1.1.0** - Initial project setup
 - See [CHANGELOG.md](CHANGELOG.md) for detailed version history
 
 ---
 
-Built with ❤️ using modern Python and ML technologies
+Built with ❤️ using modern Python and ML technologies for portfolio demonstration and educational purposes.

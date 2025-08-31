@@ -1,0 +1,24 @@
+# Web Interface Requirements
+# Core Streamlit and ML dependencies
+
+# Streamlit framework
+streamlit>=1.28.0
+
+# ML and data processing
+torch>=2.0.0
+transformers>=4.30.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Visualization and charts
+plotly>=5.15.0
+openpyxl>=3.1.0
+
+# Additional utilities
+Pillow>=10.0.0
+requests>=2.31.0
+
+# Development dependencies (optional)
+# streamlit-testing>=0.2.0
+# pytest>=7.4.0
+# pytest-playwright>=0.4.0

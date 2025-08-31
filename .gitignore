@@ -212,3 +212,9 @@ Thumbs.db
 
 # Poetry
 poetry.lock
+
+# BMAD and Cursor folders (local development tools)
+.bmad/
+.bmad-core/
+cursor/
+.cursor/
