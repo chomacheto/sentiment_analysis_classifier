@@ -107,7 +107,7 @@ class SentimentDisplay:
             
             # Additional metadata if available
             if "model_confidence" in result and result["model_confidence"]:
-                self._render_model_confidence(result["model_confidence"])
+                self._render_model_confidence(result["model_confidence"], result)
     
     def _render_confidence_section(self, confidence_score: float, colors: Dict[str, str]) -> None:
         """
@@ -218,25 +218,40 @@ class SentimentDisplay:
             unsafe_allow_html=True
         )
     
-    def _render_model_confidence(self, model_confidence: list) -> None:
+    def _render_model_confidence(self, model_confidence: list, result: dict = None) -> None:
         """
         Render detailed model confidence scores.
         
         Args:
             model_confidence: List of model confidence scores
+            result: Full result dictionary for attention visualization
         """
         if not model_confidence:
             return
         
         st.markdown("**📊 Model Confidence Breakdown:**")
         
-        # Create columns for each confidence score
-        cols = st.columns(len(model_confidence))
+        # Flatten the model_confidence structure
+        flattened_scores = []
+        for score_data in model_confidence:
+            if isinstance(score_data, list):
+                flattened_scores.extend(score_data)
+            else:
+                flattened_scores.append(score_data)
         
-        for i, score_data in enumerate(model_confidence):
+        # Create columns for each confidence score
+        cols = st.columns(len(flattened_scores))
+        
+        for i, score_data in enumerate(flattened_scores):
             with cols[i]:
-                label = score_data.get("label", f"Class {i}")
-                score = score_data.get("score", 0.0)
+                # Handle dictionary format from Hugging Face pipeline
+                if isinstance(score_data, dict):
+                    label = score_data.get("label", f"Class {i}")
+                    score = score_data.get("score", 0.0)
+                else:
+                    # Fallback for direct score values
+                    label = f"Class {i}"
+                    score = float(score_data) if score_data is not None else 0.0
                 percentage = score * 100
                 
                 # Color based on score
@@ -267,12 +282,14 @@ class SentimentDisplay:
                     unsafe_allow_html=True
                 )
         
-        # Add enhanced confidence metrics link
-        if st.button("🔍 View Enhanced Confidence Metrics", help="Open detailed confidence visualization"):
+        # Add enhanced confidence metrics link with unique key
+        import uuid
+        unique_key = f"enhanced_confidence_btn_{uuid.uuid4().hex[:8]}"
+        if st.button("🔍 View Enhanced Confidence Metrics", help="Open detailed confidence visualization", key=unique_key):
             st.session_state.show_enhanced_confidence = True
         
         # Add attention visualization if available
-        if "attention_weights" in result:
+        if result and "attention_weights" in result:
             st.markdown("---")
             st.subheader("🧠 Explainable AI - Word-Level Analysis")
             self.attention_viz.render(result)

@@ -190,14 +190,27 @@ class ConfidenceMetrics:
         
         st.markdown("**📈 Probability Distribution Across All Sentiment Classes**")
         
+        # Flatten the model_confidence structure (same as in sentiment_display.py)
+        flattened_scores = []
+        for score_data in model_confidence:
+            if isinstance(score_data, list):
+                flattened_scores.extend(score_data)
+            else:
+                flattened_scores.append(score_data)
+        
         # Extract data for plotting
         labels = []
         scores = []
         colors = []
         
-        for score_data in model_confidence:
-            label = score_data.get("label", "Unknown")
-            score = score_data.get("score", 0.0)
+        for score_data in flattened_scores:
+            if isinstance(score_data, dict):
+                label = score_data.get("label", "Unknown")
+                score = score_data.get("score", 0.0)
+            else:
+                # Fallback for direct score values
+                label = "Unknown"
+                score = float(score_data) if score_data is not None else 0.0
             
             labels.append(label.title())
             scores.append(score)
@@ -270,7 +283,23 @@ class ConfidenceMetrics:
         with col2:
             # Calculate additional metrics
             if model_confidence:
-                second_highest = sorted([s.get("score", 0) for s in model_confidence], reverse=True)[1] if len(model_confidence) > 1 else 0
+                # Flatten the model_confidence structure for calculations
+                flattened_scores = []
+                for score_data in model_confidence:
+                    if isinstance(score_data, list):
+                        flattened_scores.extend(score_data)
+                    else:
+                        flattened_scores.append(score_data)
+                
+                # Extract scores for calculations
+                scores_list = []
+                for score_data in flattened_scores:
+                    if isinstance(score_data, dict):
+                        scores_list.append(score_data.get("score", 0.0))
+                    else:
+                        scores_list.append(float(score_data) if score_data is not None else 0.0)
+                
+                second_highest = sorted(scores_list, reverse=True)[1] if len(scores_list) > 1 else 0
                 margin = confidence_score - second_highest
                 
                 st.metric(
@@ -280,7 +309,7 @@ class ConfidenceMetrics:
                 )
                 
                 # Confidence stability (how close scores are)
-                score_variance = sum((s.get("score", 0) - confidence_score) ** 2 for s in model_confidence) / len(model_confidence)
+                score_variance = sum((score - confidence_score) ** 2 for score in scores_list) / len(scores_list)
                 stability = 1 - min(score_variance * 10, 1)  # Normalize to 0-1
                 
                 st.metric(
@@ -293,11 +322,24 @@ class ConfidenceMetrics:
         st.markdown("**🔍 Detailed Confidence Breakdown:**")
         
         if model_confidence:
+            # Flatten the model_confidence structure for detailed breakdown
+            flattened_scores = []
+            for score_data in model_confidence:
+                if isinstance(score_data, list):
+                    flattened_scores.extend(score_data)
+                else:
+                    flattened_scores.append(score_data)
+            
             # Create a detailed table
             breakdown_data = []
-            for score_data in model_confidence:
-                label = score_data.get("label", "Unknown")
-                score = score_data.get("score", 0.0)
+            for score_data in flattened_scores:
+                if isinstance(score_data, dict):
+                    label = score_data.get("label", "Unknown")
+                    score = score_data.get("score", 0.0)
+                else:
+                    # Fallback for direct score values
+                    label = "Unknown"
+                    score = float(score_data) if score_data is not None else 0.0
                 percentage = score * 100
                 
                 # Determine status

@@ -43,7 +43,8 @@ class TextInputComponent:
         with input_container:
             # Text area with character limit
             user_input = st.text_area(
-                label="",
+                label="Text Input",
+                label_visibility="collapsed",
                 placeholder=self.placeholder,
                 height=150,
                 max_chars=self.max_chars,
